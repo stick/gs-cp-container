@@ -1,0 +1,191 @@
+CellProfiler Pipeline: http://www.cellprofiler.org
+Version:5
+DateRevision:407
+GitHash:
+ModuleCount:13
+HasImagePlaneDetails:False
+
+LoadData:[module_num:1|svn_version:'Unknown'|variable_revision_number:6|show_window:True|notes:[]|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Input data file location:Elsewhere...|C:\\Users\\emilr\\Downloads
+    Name of the file:image_list (1).csv
+    Load images based on this data?:Yes
+    Base image location:Default Input Folder|
+    Process just a range of rows?:No
+    Rows to process:1,100000
+    Group images by metadata?:No
+    Select metadata tags for grouping:
+    Rescale intensities?:Yes
+
+IdentifyPrimaryObjects:[module_num:2|svn_version:'Unknown'|variable_revision_number:14|show_window:True|notes:['Identify the nuclei from the DNA image. Some manual adjustment of the threshold correction factor and  smoothing filter size is required to optimize segmentation.']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the input image:DNA
+    Name the primary objects to be identified:Nuclei
+    Typical diameter of objects, in pixel units (Min,Max):8,40
+    Discard objects outside the diameter range?:Yes
+    Discard objects touching the border of the image?:Yes
+    Method to distinguish clumped objects:Intensity
+    Method to draw dividing lines between clumped objects:Intensity
+    Size of smoothing filter:6
+    Suppress local maxima that are closer than this minimum allowed distance:5
+    Speed up by using lower-resolution image to find local maxima?:Yes
+    Fill holes in identified objects?:After both thresholding and declumping
+    Automatically calculate size of smoothing filter for declumping?:No
+    Automatically calculate minimum allowed distance between local maxima?:Yes
+    Handling of objects if excessive number of objects identified:Continue
+    Maximum number of objects:500
+    Display accepted local maxima?:No
+    Select maxima color:Blue
+    Use advanced settings?:Yes
+    Threshold setting version:12
+    Threshold strategy:Global
+    Thresholding method:Otsu
+    Threshold smoothing scale:1.3488
+    Threshold correction factor:1
+    Lower and upper bounds on threshold:0.04,1
+    Manual threshold:0.0
+    Select the measurement to threshold with:None
+    Two-class or three-class thresholding?:Three classes
+    Log transform before thresholding?:Yes
+    Assign pixels in the middle intensity class to the foreground or the background?:Background
+    Size of adaptive window:10
+    Lower outlier fraction:0.05
+    Upper outlier fraction:0.05
+    Averaging method:Mean
+    Variance method:Standard deviation
+    # of deviations:2
+    Thresholding method:Default
+
+IdentifySecondaryObjects:[module_num:3|svn_version:'Unknown'|variable_revision_number:10|show_window:True|notes:['Identify the cells by using the nuclei as a "seed" region, then growing outwards until stopped by the image threshold or by a neighbor. The Propagation method is used to delineate the boundary between neighboring cells.']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the input objects:Nuclei
+    Name the objects to be identified:Cells
+    Select the method to identify the secondary objects:Watershed - Gradient
+    Select the input image:GFP
+    Number of pixels by which to expand the primary objects:10
+    Regularization factor:0.05
+    Discard secondary objects touching the border of the image?:No
+    Discard the associated primary objects?:No
+    Name the new primary objects:FilteredNuclei
+    Fill holes in identified objects?:Yes
+    Threshold setting version:12
+    Threshold strategy:Global
+    Thresholding method:Otsu
+    Threshold smoothing scale:0.1
+    Threshold correction factor:0.5
+    Lower and upper bounds on threshold:0.01,1
+    Manual threshold:0
+    Select the measurement to threshold with:None
+    Two-class or three-class thresholding?:Two classes
+    Log transform before thresholding?:No
+    Assign pixels in the middle intensity class to the foreground or the background?:Background
+    Size of adaptive window:10
+    Lower outlier fraction:0.05
+    Upper outlier fraction:0.05
+    Averaging method:Mean
+    Variance method:Standard deviation
+    # of deviations:2
+    Thresholding method:Default
+
+IdentifyTertiaryObjects:[module_num:4|svn_version:'Unknown'|variable_revision_number:3|show_window:True|notes:['Identify the cytoplasm by "subtracting" the nuclei objects from the cell objects found using the Progagtion method.']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the larger identified objects:Cells
+    Select the smaller identified objects:Nuclei
+    Name the tertiary objects to be identified:Cytoplasm
+    Shrink smaller object prior to subtraction?:Yes
+
+MeasureObjectIntensity:[module_num:5|svn_version:'Unknown'|variable_revision_number:4|show_window:True|notes:['Measure intensity features from nuclei, cell and cytoplasm objects against the corrected DNA and GFP images.']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select images to measure:DNA
+    Select objects to measure:Nuclei
+
+MeasureObjectIntensity:[module_num:6|svn_version:'Unknown'|variable_revision_number:4|show_window:True|notes:[]|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select images to measure:GFP
+    Select objects to measure:Cells
+
+MeasureObjectSizeShape:[module_num:7|svn_version:'Unknown'|variable_revision_number:3|show_window:True|notes:['Measure morphological features from the cell, nuclei and cytoplasm objects.']|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select object sets to measure:Nuclei, Cells
+    Calculate the Zernike features?:No
+    Calculate the advanced features?:No
+
+MeasureObjectNeighbors:[module_num:8|svn_version:'Unknown'|variable_revision_number:3|show_window:True|notes:[]|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select objects to measure:Nuclei
+    Select neighboring objects to measure:Nuclei
+    Method to determine neighbors:Expand until adjacent
+    Neighbor distance:5
+    Consider objects discarded for touching image border?:Yes
+    Retain the image of objects colored by numbers of neighbors?:No
+    Name the output image:ObjectNeighborCount
+    Select colormap:Default
+    Retain the image of objects colored by percent of touching pixels?:No
+    Name the output image:PercentTouching
+    Select colormap:Default
+
+ExportToSpreadsheet:[module_num:9|svn_version:'Unknown'|variable_revision_number:13|show_window:True|notes:[]|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the column delimiter:Comma (",")
+    Add image metadata columns to your object data file?:No
+    Add image file and folder names to your object data file?:No
+    Select the measurements to export:Yes
+    Calculate the per-image mean values for object measurements?:Yes
+    Calculate the per-image median values for object measurements?:No
+    Calculate the per-image standard deviation values for object measurements?:No
+    Output file location:Default Output Folder|
+    Create a GenePattern GCT file?:No
+    Select source of sample row name:Metadata
+    Select the image to use as the identifier:None
+    Select the metadata to use as the identifier:None
+    Export all measurement types?:Yes
+    Press button to select measurements:Image|Threshold_OrigThreshold_Nuclei,Image|Threshold_OrigThreshold_Cells,Image|Threshold_SumOfEntropies_Cells,Image|Threshold_SumOfEntropies_Nuclei,Image|Threshold_FinalThreshold_Cells,Image|Threshold_FinalThreshold_Nuclei,Image|Threshold_WeightedVariance_Nuclei,Image|Threshold_WeightedVariance_Cells,Image|ImageNumber,Image|ImageId,Image|Count_Cytoplasm,Image|Count_Cells,Image|Count_Nuclei,Image|ImageName,Image|Plate,Image|WellId,Image|Well,Image|PlateId,Nuclei|Intensity_MinIntensityEdge_DNA,Nuclei|Intensity_MaxIntensity_DNA,Nuclei|Intensity_MADIntensity_DNA,Nuclei|Intensity_IntegratedIntensityEdge_DNA,Nuclei|Intensity_StdIntensityEdge_DNA,Nuclei|Intensity_MaxIntensityEdge_DNA,Nuclei|Intensity_MinIntensity_DNA,Nuclei|Intensity_UpperQuartileIntensity_DNA,Nuclei|Intensity_StdIntensity_DNA,Nuclei|Intensity_MeanIntensity_DNA,Nuclei|Intensity_MedianIntensity_DNA,Nuclei|Intensity_MeanIntensityEdge_DNA,Nuclei|Intensity_MassDisplacement_DNA,Nuclei|Intensity_IntegratedIntensity_DNA,Nuclei|Intensity_LowerQuartileIntensity_DNA,Nuclei|AreaShape_Perimeter,Nuclei|AreaShape_MaximumRadius,Nuclei|AreaShape_FormFactor,Nuclei|AreaShape_EulerNumber,Nuclei|AreaShape_Solidity,Nuclei|AreaShape_Center_Y,Nuclei|AreaShape_Center_X,Nuclei|AreaShape_Compactness,Nuclei|AreaShape_Eccentricity,Nuclei|AreaShape_MeanRadius,Nuclei|AreaShape_MinorAxisLength,Nuclei|AreaShape_MaxFeretDiameter,Nuclei|AreaShape_Extent,Nuclei|AreaShape_Area,Nuclei|AreaShape_MinFeretDiameter,Nuclei|AreaShape_Orientation,Nuclei|AreaShape_MedianRadius,Nuclei|AreaShape_MajorAxisLength,Nuclei|Location_CenterMassIntensity_X_DNA,Nuclei|Location_CenterMassIntensity_Z_DNA,Nuclei|Location_CenterMassIntensity_Y_DNA,Nuclei|Location_Center_Y,Nuclei|Location_Center_X,Nuclei|Location_Center_Z,Nuclei|Location_MaxIntensity_Z_DNA,Nuclei|Location_MaxIntensity_X_DNA,Nuclei|Location_MaxIntensity_Y_DNA,Nuclei|Neighbors_FirstClosestObjectNumber_Expanded,Nuclei|Neighbors_FirstClosestDistance_Expanded,Nuclei|Neighbors_SecondClosestDistance_Expanded,Nuclei|Neighbors_NumberOfNeighbors_Expanded,Nuclei|Neighbors_SecondClosestObjectNumber_Expanded,Nuclei|Neighbors_AngleBetweenNeighbors_Expanded,Nuclei|Neighbors_PercentTouching_Expanded,Nuclei|Children_Cytoplasm_Count,Nuclei|Children_Cells_Count,Nuclei|Number_Object_Number,Cells|AreaShape_Area,Cells|AreaShape_Extent,Cells|AreaShape_EulerNumber,Cells|AreaShape_Eccentricity,Cells|AreaShape_MeanRadius,Cells|AreaShape_MedianRadius,Cells|AreaShape_MaximumRadius,Cells|AreaShape_Center_Y,Cells|AreaShape_Center_X,Cells|AreaShape_MaxFeretDiameter,Cells|AreaShape_MajorAxisLength,Cells|AreaShape_FormFactor,Cells|AreaShape_Perimeter,Cells|AreaShape_Compactness,Cells|AreaShape_Orientation,Cells|AreaShape_Solidity,Cells|AreaShape_MinFeretDiameter,Cells|AreaShape_MinorAxisLength,Cells|Location_Center_X,Cells|Location_Center_Z,Cells|Location_Center_Y,Cells|Location_CenterMassIntensity_Y_GFP,Cells|Location_CenterMassIntensity_X_GFP,Cells|Location_CenterMassIntensity_Z_GFP,Cells|Location_MaxIntensity_Z_GFP,Cells|Location_MaxIntensity_Y_GFP,Cells|Location_MaxIntensity_X_GFP,Cells|Intensity_MaxIntensity_GFP,Cells|Intensity_LowerQuartileIntensity_GFP,Cells|Intensity_MaxIntensityEdge_GFP,Cells|Intensity_MeanIntensity_GFP,Cells|Intensity_MinIntensityEdge_GFP,Cells|Intensity_MADIntensity_GFP,Cells|Intensity_IntegratedIntensity_GFP,Cells|Intensity_MedianIntensity_GFP,Cells|Intensity_MassDisplacement_GFP,Cells|Intensity_StdIntensityEdge_GFP,Cells|Intensity_MinIntensity_GFP,Cells|Intensity_UpperQuartileIntensity_GFP,Cells|Intensity_StdIntensity_GFP,Cells|Intensity_IntegratedIntensityEdge_GFP,Cells|Intensity_MeanIntensityEdge_GFP,Cells|Children_Cytoplasm_Count,Cells|Number_Object_Number,Cells|Parent_Nuclei,Cytoplasm|Number_Object_Number,Cytoplasm|Location_Center_Y,Cytoplasm|Location_Center_X,Cytoplasm|Parent_Cells,Cytoplasm|Parent_Nuclei
+    Representation of Nan/Inf:NaN
+    Add a prefix to file names?:Yes
+    Filename prefix:MyExpt_
+    Overwrite existing files without warning?:No
+    Data to export:Do not use
+    Combine these object measurements with those of the previous object?:No
+    File name:DATA.csv
+    Use the object name for the file name?:Yes
+
+ConvertObjectsToImage:[module_num:10|svn_version:'Unknown'|variable_revision_number:1|show_window:True|notes:[]|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the input objects:Cytoplasm
+    Name the output image:GFP_
+    Select the color format:Grayscale
+    Select the colormap:Default
+
+ConvertObjectsToImage:[module_num:11|svn_version:'Unknown'|variable_revision_number:1|show_window:True|notes:[]|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the input objects:Nuclei
+    Name the output image:DNA_
+    Select the color format:Grayscale
+    Select the colormap:Default
+
+SaveImages:[module_num:12|svn_version:'Unknown'|variable_revision_number:15|show_window:True|notes:[]|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the type of image to save:Image
+    Select the image to save:DNA_
+    Select method for constructing file names:Sequential numbers
+    Select image name for file prefix:DNA
+    Enter file prefix:DNA_
+    Number of digits:4
+    Append a suffix to the image file name?:No
+    Text to append to the image name:
+    Saved file format:tiff
+    Output file location:Default Output Folder|
+    Image bit depth:16-bit integer
+    Overwrite existing files without warning?:No
+    When to save:Every cycle
+    Record the file and path information to the saved image?:No
+    Create subfolders in the output folder?:No
+    Base image folder:Elsewhere...|
+    How to save the series:T (Time)
+
+SaveImages:[module_num:13|svn_version:'Unknown'|variable_revision_number:15|show_window:True|notes:[]|batch_state:array([], dtype=uint8)|enabled:True|wants_pause:False]
+    Select the type of image to save:Image
+    Select the image to save:GFP_
+    Select method for constructing file names:Sequential numbers
+    Select image name for file prefix:None
+    Enter file prefix:GFP_
+    Number of digits:4
+    Append a suffix to the image file name?:No
+    Text to append to the image name:
+    Saved file format:tiff
+    Output file location:Default Output Folder|
+    Image bit depth:16-bit integer
+    Overwrite existing files without warning?:No
+    When to save:Every cycle
+    Record the file and path information to the saved image?:No
+    Create subfolders in the output folder?:No
+    Base image folder:Elsewhere...|
+    How to save the series:T (Time)

@@ -25,17 +25,22 @@ RUN pip3.8 install numpy
 RUN sed -i -e 's/numpy==1.19.3/numpy==1.20.3/' setup.py
 # build cp
 RUN pip3.8 install -U -e .
+# additionally tooling
+RUN pip3.8 install -U omero-py
+RUN pip3.8 install -U https://github.com/glencoesoftware/omero-reader/releases/download/v0.1.0/omero_reader-0.1.0.tar.gz
+RUN pip3.8 install -U https://github.com/glencoesoftware/omero-user-token/releases/download/v0.1.1/omero_user_token-0.1.1-py2.py3-none-any.whl
 
+RUN apt -y install graphviz graphviz-dev
+# copy in cp_cp_util
+ENV CP_CP_UTIL_VERSION 0.7.4
+COPY cp_cp_util-$CP_CP_UTIL_VERSION.tar.gz /tmp/
+RUN pip3.8 install -U /tmp/cp_cp_util-$CP_CP_UTIL_VERSION.tar.gz
 
-# install omero-py
-#COPY omero_user_token-0.1.1-py2.py3-none-any.whl /tmp/
-#RUN pip install -U /tmp/omero_user_token-0.1.1-py2.py3-none-any.whl
+# test data
+COPY *.cppipe /tmp/
 
-# install segmentation utils
-#COPY segmentation_utils-0.1.1-py2.py3-none-any.whl /tmp/
-#RUN pip install -U /tmp/segmentation_utils-0.1.1-py2.py3-none-any.whl
+WORKDIR /opt/omero
+User omero
 
-#WORKDIR /opt/omero
-#User omero
 #ADD ometiff-conversion-import.sh /usr/local/bin/
 #ENTRYPOINT ["/usr/local/bin/ometiff-conversion-import.sh"]
